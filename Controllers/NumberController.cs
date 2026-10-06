@@ -38,8 +38,8 @@ namespace Parcial1_P4_Jason.Controllers
                 Resultado = number.Numero + number.Numero
             };
 
-            await numbersService.SaveAsync(nuevo);
-            return Ok(nuevo);
+            var id = await numbersService.SaveAsync(nuevo);
+            return Ok(nuevo with { Id = id });
         }
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] NumberRecord number)
@@ -57,9 +57,12 @@ namespace Parcial1_P4_Jason.Controllers
                 Fecha = DateTime.UtcNow,
                 Resultado = number.Numero + number.Numero
             };
-
             await numbersService.UpdateAsync(actualizado);
-
+            var guardado = await numbersService.UpdateAsync(actualizado);
+            if (!guardado)
+            {
+                return StatusCode(500, "No se pudo guardar el cambio.");
+            }
             return Ok(new
             {
                 Numero_Anterior = row.Numero,
